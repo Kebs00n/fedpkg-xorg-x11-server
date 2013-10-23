@@ -42,7 +42,7 @@
 Summary:   X.Org X11 X server
 Name:      xorg-x11-server
 Version:   1.14.3
-Release:   1%{?gitdate:.%{gitdate}}%{dist}
+Release:   2%{?gitdate:.%{gitdate}}%{dist}
 URL:       http://www.x.org
 License:   MIT
 Group:     User Interface/X
@@ -119,6 +119,9 @@ Patch8041: 0001-pixmap-fix-reverse-optimus-support-with-multiple-hea.patch
 %if !0%{?rhel}
 Patch7071: 0001-os-use-libunwind-to-generate-backtraces.patch
 %endif
+
+# Bug 1019821: Xdmx mouse after button-click goes to upper-left position
+Patch9040: 0001-dmx-queue-button-events-with-valid-valuators.patch
 
 %global moduledir	%{_libdir}/xorg/modules
 %global drimoduledir	%{_libdir}/dri
@@ -592,6 +595,9 @@ rm -rf $RPM_BUILD_ROOT
 %{xserver_source_dir}
 
 %changelog
+* Wed Oct 23 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.14.3-2
+- Fix Xdmx cursor jumps (#1019821)
+
 * Mon Sep 16 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.14.3-1
 - xserver 1.14.3
 

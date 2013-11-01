@@ -42,7 +42,7 @@
 Summary:   X.Org X11 X server
 Name:      xorg-x11-server
 Version:   1.14.3
-Release:   2%{?gitdate:.%{gitdate}}%{dist}
+Release:   3%{?gitdate:.%{gitdate}}%{dist}
 URL:       http://www.x.org
 License:   MIT
 Group:     User Interface/X
@@ -86,6 +86,11 @@ Patch6030: xserver-1.6.99-right-of.patch
 
 # upstream submitted
 Patch6052: 0001-randr-upstream-set-changed-fixes.patch
+
+# randr fixes - upstream backport submitted
+Patch7000: 0001-randr-send-RRProviderChangeNotify-event.patch
+Patch7001: 0002-randr-send-RRResourceChangeNotify-event.patch
+Patch7002: 0003-randr-deliver-Output-and-Crtc-events-of-attached-out.patch
 
 # Fix libselinux-triggered build error
 # RedHat/Fedora-specific patch

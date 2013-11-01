@@ -1,0 +1,175 @@
+From a9ca93dcf9a711b3d60fbad31cbd44e0c82b6f42 Mon Sep 17 00:00:00 2001
+From: Michal Srb <msrb@suse.com>
+Date: Wed, 30 Oct 2013 13:33:50 +0200
+Subject: [PATCH 2/3] randr: send RRResourceChangeNotify event
+
+Send RRResourceChangeNotify event when provider, output or crtc was created or
+destroyed. I.e. when the list of resources returned by RRGetScreenResources and
+RRGetProviders changes.
+
+Reviewed-by: Dave Airlie <airlied@redhat.com>
+Signed-off-by: Michal Srb <msrb@suse.com>
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ hw/xfree86/common/xf86platformBus.c |  5 +++++
+ randr/randr.c                       | 36 ++++++++++++++++++++++++++++++++++++
+ randr/randrstr.h                    |  4 ++++
+ randr/rrcrtc.c                      |  4 ++++
+ randr/rroutput.c                    |  5 +++++
+ 5 files changed, 54 insertions(+)
+
+diff --git a/hw/xfree86/common/xf86platformBus.c b/hw/xfree86/common/xf86platformBus.c
+index e368dee..33b2b7d 100644
+--- a/hw/xfree86/common/xf86platformBus.c
++++ b/hw/xfree86/common/xf86platformBus.c
+@@ -466,6 +466,9 @@ xf86platformAddDevice(int index)
+    /* attach unbound to 0 protocol screen */
+    AttachUnboundGPU(xf86Screens[0]->pScreen, xf86GPUScreens[i]->pScreen);
+ 
++   RRResourcesChanged(xf86Screens[0]->pScreen);
++   RRTellChanged(xf86Screens[0]->pScreen);
++
+    return 0;
+ }
+ 
+@@ -508,6 +511,8 @@ xf86platformRemoveDevice(int index)
+     xf86UnclaimPlatformSlot(&xf86_platform_devices[index], NULL);
+ 
+     xf86_remove_platform_device(index);
++
++    RRResourcesChanged(xf86Screens[0]->pScreen);
+     RRTellChanged(xf86Screens[0]->pScreen);
+  out:
+     return;
+diff --git a/randr/randr.c b/randr/randr.c
+index fa0a4da..9cec6f6 100644
+--- a/randr/randr.c
++++ b/randr/randr.c
+@@ -420,6 +420,32 @@ RRExtensionInit(void)
+ #endif
+ }
+ 
++void
++RRResourcesChanged(ScreenPtr pScreen)
++{
++    rrScrPriv(pScreen);
++    pScrPriv->resourcesChanged = TRUE;
++
++    RRSetChanged(pScreen);
++}
++
++static void
++RRDeliverResourceEvent(ClientPtr client, WindowPtr pWin)
++{
++    ScreenPtr pScreen = pWin->drawable.pScreen;
++
++    rrScrPriv(pScreen);
++
++    xRRResourceChangeNotifyEvent re = {
++        .type = RRNotify + RREventBase,
++        .subCode = RRNotify_ResourceChange,
++        .timestamp = pScrPriv->lastSetTime.milliseconds,
++        .window = pWin->drawable.id
++    };
++
++    WriteEventsToClient(client, 1, (xEvent *) &re);
++}
++
+ static int
+ TellChanged(WindowPtr pWin, pointer value)
+ {
+@@ -480,6 +506,12 @@ TellChanged(WindowPtr pWin, pointer value)
+                     RRDeliverProviderEvent(client, pWin, pSlaveScrPriv->provider);
+             }
+         }
++
++        if (pRREvent->mask & RRResourceChangeNotifyMask) {
++            if (pScrPriv->resourcesChanged) {
++                RRDeliverResourceEvent(client, pWin);
++            }
++        }
+     }
+     return WT_WALKCHILDREN;
+ }
+@@ -536,7 +568,11 @@ RRTellChanged(ScreenPtr pScreen)
+         }
+         pScrPriv->changed = FALSE;
+         mastersp->changed = FALSE;
++
+         WalkTree(master, TellChanged, (pointer) master);
++
++        mastersp->resourcesChanged = FALSE;
++
+         for (i = 0; i < pScrPriv->numOutputs; i++)
+             pScrPriv->outputs[i]->changed = FALSE;
+         for (i = 0; i < pScrPriv->numCrtcs; i++)
+diff --git a/randr/randrstr.h b/randr/randrstr.h
+index c933349..15299fd 100644
+--- a/randr/randrstr.h
++++ b/randr/randrstr.h
+@@ -301,6 +301,7 @@ typedef struct _rrScrPriv {
+     Bool changed;               /* some config changed */
+     Bool configChanged;         /* configuration changed */
+     Bool layoutChanged;         /* screen layout changed */
++    Bool resourcesChanged;      /* screen resources change */
+ 
+     CARD16 minWidth, minHeight;
+     CARD16 maxWidth, maxHeight;
+@@ -486,6 +487,9 @@ extern _X_EXPORT int
+ extern _X_EXPORT void
+  RRDeliverScreenEvent(ClientPtr client, WindowPtr pWin, ScreenPtr pScreen);
+ 
++extern _X_EXPORT void
++ RRResourcesChanged(ScreenPtr pScreen);
++
+ /* randr.c */
+ /* set a screen change on the primary screen */
+ extern _X_EXPORT void
+diff --git a/randr/rrcrtc.c b/randr/rrcrtc.c
+index 2f76b62..99b3dca 100644
+--- a/randr/rrcrtc.c
++++ b/randr/rrcrtc.c
+@@ -102,6 +102,8 @@ RRCrtcCreate(ScreenPtr pScreen, void *devPrivate)
+     crtc->pScreen = pScreen;
+     pScrPriv->crtcs[pScrPriv->numCrtcs++] = crtc;
+ 
++    RRResourcesChanged(pScreen);
++
+     return crtc;
+ }
+ 
+@@ -669,6 +671,8 @@ RRCrtcDestroyResource(pointer value, XID pid)
+                 break;
+             }
+         }
++
++        RRResourcesChanged(pScreen);
+     }
+ 
+     if (crtc->scanout_pixmap)
+diff --git a/randr/rroutput.c b/randr/rroutput.c
+index 922d61f..2b0b82f 100644
+--- a/randr/rroutput.c
++++ b/randr/rroutput.c
+@@ -101,6 +101,9 @@ RROutputCreate(ScreenPtr pScreen,
+         return NULL;
+ 
+     pScrPriv->outputs[pScrPriv->numOutputs++] = output;
++
++    RRResourcesChanged(pScreen);
++
+     return output;
+ }
+ 
+@@ -355,6 +358,8 @@ RROutputDestroyResource(pointer value, XID pid)
+                 break;
+             }
+         }
++
++        RRResourcesChanged(pScreen);
+     }
+     if (output->modes) {
+         for (m = 0; m < output->numModes; m++)
+-- 
+1.8.1.4
+

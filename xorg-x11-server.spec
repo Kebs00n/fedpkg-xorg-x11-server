@@ -600,6 +600,9 @@ rm -rf $RPM_BUILD_ROOT
 %{xserver_source_dir}
 
 %changelog
+* Fri Nov 01 2013 Dave Airlie <airlied@redhat.com> 1.14.3-3
+- backport upstream randr fixes
+
 * Wed Oct 23 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.14.3-2
 - Fix Xdmx cursor jumps (#1019821)
 

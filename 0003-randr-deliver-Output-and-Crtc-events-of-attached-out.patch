@@ -1,0 +1,68 @@
+From 85ae44f07fa21b4a48d95d736dc8135bd4f751d0 Mon Sep 17 00:00:00 2001
+From: Michal Srb <msrb@suse.com>
+Date: Wed, 30 Oct 2013 13:33:51 +0200
+Subject: [PATCH 3/3] randr: deliver Output and Crtc events of attached output
+ providers.
+
+Consider all attached output providers when looking for changed outputs and
+crtcs.
+
+Reviewed-by: Dave Airlie <airlied@redhat.com>
+Signed-off-by: Michal Srb <msrb@suse.com>
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ randr/randr.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/randr/randr.c b/randr/randr.c
+index 9cec6f6..3c51427 100644
+--- a/randr/randr.c
++++ b/randr/randr.c
+@@ -478,6 +478,16 @@ TellChanged(WindowPtr pWin, pointer value)
+                 if (crtc->changed)
+                     RRDeliverCrtcEvent(client, pWin, crtc);
+             }
++
++            xorg_list_for_each_entry(iter, &pScreen->output_slave_list, output_head) {
++                pSlaveScrPriv = rrGetScrPriv(iter);
++                for (i = 0; i < pSlaveScrPriv->numCrtcs; i++) {
++                    RRCrtcPtr crtc = pSlaveScrPriv->crtcs[i];
++
++                    if (crtc->changed)
++                        RRDeliverCrtcEvent(client, pWin, crtc);
++                }
++            }
+         }
+ 
+         if (pRREvent->mask & RROutputChangeNotifyMask) {
+@@ -487,6 +497,16 @@ TellChanged(WindowPtr pWin, pointer value)
+                 if (output->changed)
+                     RRDeliverOutputEvent(client, pWin, output);
+             }
++
++            xorg_list_for_each_entry(iter, &pScreen->output_slave_list, output_head) {
++                pSlaveScrPriv = rrGetScrPriv(iter);
++                for (i = 0; i < pSlaveScrPriv->numOutputs; i++) {
++                    RROutputPtr output = pSlaveScrPriv->outputs[i];
++
++                    if (output->changed)
++                        RRDeliverOutputEvent(client, pWin, output);
++                }
++            }
+         }
+ 
+         if (pRREvent->mask & RRProviderChangeNotifyMask) {
+@@ -581,6 +601,10 @@ RRTellChanged(ScreenPtr pScreen)
+         xorg_list_for_each_entry(iter, &master->output_slave_list, output_head) {
+             pSlaveScrPriv = rrGetScrPriv(iter);
+             pSlaveScrPriv->provider->changed = FALSE;
++            for (i = 0; i < pSlaveScrPriv->numOutputs; i++)
++                pSlaveScrPriv->outputs[i]->changed = FALSE;
++            for (i = 0; i < pSlaveScrPriv->numCrtcs; i++)
++                pSlaveScrPriv->crtcs[i]->changed = FALSE;
+         }
+         xorg_list_for_each_entry(iter, &master->offload_slave_list, offload_head) {
+             pSlaveScrPriv = rrGetScrPriv(iter);
+-- 
+1.8.1.4
+

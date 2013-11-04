@@ -42,7 +42,7 @@
 Summary:   X.Org X11 X server
 Name:      xorg-x11-server
 Version:   1.14.4
-Release:   1%{?gitdate:.%{gitdate}}%{dist}
+Release:   2%{?gitdate:.%{gitdate}}%{dist}
 URL:       http://www.x.org
 License:   MIT
 Group:     User Interface/X
@@ -600,6 +600,9 @@ rm -rf $RPM_BUILD_ROOT
 %{xserver_source_dir}
 
 %changelog
+* Mon Nov 04 2013 Dave Airlie <airlied@redhat.com> 1.14.4-2
+- fix ABI breakage introduced in 1.14.3-3
+
 * Mon Nov 04 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.14.4-1
 - xserver 1.14.4
 

@@ -1,7 +1,7 @@
-From a9ca93dcf9a711b3d60fbad31cbd44e0c82b6f42 Mon Sep 17 00:00:00 2001
+From de7b09812adb0f6ec6eb5f4be79e54ed4b42e6cd Mon Sep 17 00:00:00 2001
 From: Michal Srb <msrb@suse.com>
 Date: Wed, 30 Oct 2013 13:33:50 +0200
-Subject: [PATCH 2/3] randr: send RRResourceChangeNotify event
+Subject: [PATCH 2/2] randr: send RRResourceChangeNotify event
 
 Send RRResourceChangeNotify event when provider, output or crtc was created or
 destroyed. I.e. when the list of resources returned by RRGetScreenResources and
@@ -104,17 +104,17 @@ index fa0a4da..9cec6f6 100644
              pScrPriv->outputs[i]->changed = FALSE;
          for (i = 0; i < pScrPriv->numCrtcs; i++)
 diff --git a/randr/randrstr.h b/randr/randrstr.h
-index c933349..15299fd 100644
+index 3427378..27b4ba0 100644
 --- a/randr/randrstr.h
 +++ b/randr/randrstr.h
-@@ -301,6 +301,7 @@ typedef struct _rrScrPriv {
-     Bool changed;               /* some config changed */
-     Bool configChanged;         /* configuration changed */
-     Bool layoutChanged;         /* screen layout changed */
-+    Bool resourcesChanged;      /* screen resources change */
+@@ -337,6 +337,7 @@ typedef struct _rrScrPriv {
  
-     CARD16 minWidth, minHeight;
-     CARD16 maxWidth, maxHeight;
+     RRProviderDestroyProcPtr rrProviderDestroy;
+ 
++    Bool resourcesChanged;      /* screen resources change */
+ } rrScrPrivRec, *rrScrPrivPtr;
+ 
+ extern _X_EXPORT DevPrivateKeyRec rrPrivKeyRec;
 @@ -486,6 +487,9 @@ extern _X_EXPORT int
  extern _X_EXPORT void
   RRDeliverScreenEvent(ClientPtr client, WindowPtr pWin, ScreenPtr pScreen);
@@ -126,7 +126,7 @@ index c933349..15299fd 100644
  /* set a screen change on the primary screen */
  extern _X_EXPORT void
 diff --git a/randr/rrcrtc.c b/randr/rrcrtc.c
-index 2f76b62..99b3dca 100644
+index b3fb5bd..5cdfd05 100644
 --- a/randr/rrcrtc.c
 +++ b/randr/rrcrtc.c
 @@ -102,6 +102,8 @@ RRCrtcCreate(ScreenPtr pScreen, void *devPrivate)
@@ -138,7 +138,7 @@ index 2f76b62..99b3dca 100644
      return crtc;
  }
  
-@@ -669,6 +671,8 @@ RRCrtcDestroyResource(pointer value, XID pid)
+@@ -672,6 +674,8 @@ RRCrtcDestroyResource(pointer value, XID pid)
                  break;
              }
          }
@@ -171,5 +171,5 @@ index 922d61f..2b0b82f 100644
      if (output->modes) {
          for (m = 0; m < output->numModes; m++)
 -- 
-1.8.1.4
+1.8.3.1
 

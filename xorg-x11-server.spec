@@ -151,7 +151,7 @@ Patch9999: multiseat-with-several-videocards.patch
 %global no_int10 --disable-vbe --disable-int10-module
 %endif
 
-%global kdrive --enable-kdrive --enable-xephyr --disable-xfake --disable-xfbdev
+%global kdrive --enable-kdrive --enable-kdrive-evdev --enable-xephyr --disable-xfake --disable-xfbdev
 %global xservers --enable-xvfb --enable-xnest %{kdrive} %{enable_xorg}
 
 BuildRequires: systemtap-sdt-devel

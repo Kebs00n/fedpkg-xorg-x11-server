@@ -128,6 +128,9 @@ Patch7071: 0001-os-use-libunwind-to-generate-backtraces.patch
 # Bug 1019821: Xdmx mouse after button-click goes to upper-left position
 Patch9040: 0001-dmx-queue-button-events-with-valid-valuators.patch
 
+# My custom multiseat patches
+Patch9999: multiseat-with-several-videocards.patch
+
 %global moduledir	%{_libdir}/xorg/modules
 %global drimoduledir	%{_libdir}/dri
 %global sdkdir		%{_includedir}/xorg

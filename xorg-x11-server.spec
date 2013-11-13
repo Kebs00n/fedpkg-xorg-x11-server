@@ -42,7 +42,7 @@
 Summary:   X.Org X11 X server
 Name:      xorg-x11-server
 Version:   1.14.3
-Release:   7%{?gitdate:.%{gitdate}}%{dist}
+Release:   8%{?gitdate:.%{gitdate}}%{dist}
 URL:       http://www.x.org
 License:   MIT
 Group:     User Interface/X
@@ -641,6 +641,9 @@ rm -rf $RPM_BUILD_ROOT
 %{xserver_source_dir}
 
 %changelog
+* Wed Nov 13 2013 Dave Airlie <airlied@redhat.com> 1.14.3-8
+- unbreak ABI in last patches
+
 * Fri Nov 01 2013 Dave Airlie <airlied@redhat.com> 1.14.3-7
 - backport upstream randr fixes
 

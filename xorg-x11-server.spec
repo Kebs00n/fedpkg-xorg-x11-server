@@ -42,7 +42,7 @@
 Summary:   X.Org X11 X server
 Name:      xorg-x11-server
 Version:   1.14.4
-Release:   2%{?gitdate:.%{gitdate}}%{dist}
+Release:   3%{?gitdate:.%{gitdate}}%{dist}
 URL:       http://www.x.org
 License:   MIT
 Group:     User Interface/X
@@ -127,6 +127,9 @@ Patch7071: 0001-os-use-libunwind-to-generate-backtraces.patch
 
 # Bug 1019821: Xdmx mouse after button-click goes to upper-left position
 Patch9040: 0001-dmx-queue-button-events-with-valid-valuators.patch
+
+# Bug 1016152: tigervnc module 1.3.0-7.fc19 doesn't load: undefined symbol key_is_down
+Patch9041: 0001-include-export-key_is_down-and-friends.patch
 
 %global moduledir	%{_libdir}/xorg/modules
 %global drimoduledir	%{_libdir}/dri
@@ -600,6 +603,9 @@ rm -rf $RPM_BUILD_ROOT
 %{xserver_source_dir}
 
 %changelog
+* Wed Nov 13 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.14.4-3
+- export key_is_down for tigervnc (#1016152)
+
 * Mon Nov 04 2013 Dave Airlie <airlied@redhat.com> 1.14.4-2
 - fix ABI breakage introduced in 1.14.3-3
 

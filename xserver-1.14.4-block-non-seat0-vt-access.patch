@@ -4,15 +4,15 @@ Subject: [PATCH] xfree86: Keep a non-seat0 X server from touching VTs
  (#71258)
 
 diff --git a/hw/xfree86/common/xf86Init.c b/hw/xfree86/common/xf86Init.c
-index 91ec4c8..a678f4d 100644
+index 788f808..52f1a0a 100644
 --- a/hw/xfree86/common/xf86Init.c
 +++ b/hw/xfree86/common/xf86Init.c
-@@ -545,7 +545,7 @@ InitOutput(ScreenInfo * pScreenInfo, int argc, char **argv)
-                 want_hw_access = TRUE;
+@@ -564,7 +564,7 @@ InitOutput(ScreenInfo * pScreenInfo, int argc, char **argv)
+                     want_hw_access = TRUE;
  
-             if (!(flags & HW_SKIP_CONSOLE))
--                xorgHWOpenConsole = TRUE;
-+                xorgHWOpenConsole = !ServerIsNotSeat0();
+                 if (!(flags & HW_SKIP_CONSOLE))
+-                    xorgHWOpenConsole = TRUE;
++                    xorgHWOpenConsole = !ServerIsNotSeat0();
+             }
          }
  
-         if (xorgHWOpenConsole)

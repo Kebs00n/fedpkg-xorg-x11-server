@@ -1,0 +1,19 @@
+From: Laércio de Sousa <lbsousajr@gmail.com>
+Date: Tue, 17 Sep 2013 13:01:53 -0300
+Subject: [PATCH] xserver: enable default options for non-seat0 seats
+
+diff --git a/config/udev.c b/config/udev.c
+index de89241..b55b78e 100644
+--- a/config/udev.c
++++ b/config/udev.c
+@@ -226,6 +226,10 @@ device_added(struct udev_device *udev_device)
+ 
+     input_options = input_option_new(input_options, "config_info", config_info);
+ 
++    /* Default setting needed for non-seat0 seats */
++    if (ServerIsNotSeat0())
++        input_options = input_option_new(input_options, "GrabDevice", "on");
++
+     LogMessage(X_INFO, "config/udev: Adding input device %s (%s)\n",
+                name, path);
+     rc = NewInputDeviceRequest(input_options, &attrs, &dev);

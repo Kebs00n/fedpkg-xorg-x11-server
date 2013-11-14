@@ -173,7 +173,7 @@ Patch9016: 0006-fixes-Fix-PanoramiXSetWindowShapeRegion.patch
 Patch9996: xserver-non-seat0-defaults.patch
 Patch9997: xserver-add-matchseat.patch
 Patch9998: xserver-fix-card-detection-on-non-seat0.patch
-Patch9999: xserver-block-non-seat0-vt-access.patch
+Patch9999: xserver-1.14.4-block-non-seat0-vt-access.patch
 
 %global moduledir	%{_libdir}/xorg/modules
 %global drimoduledir	%{_libdir}/dri

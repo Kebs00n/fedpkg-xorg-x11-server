@@ -1,0 +1,13 @@
+diff --git a/hw/xfree86/common/xf86Init.c b/hw/xfree86/common/xf86Init.c
+index 91ec4c8..a678f4d 100644
+--- a/hw/xfree86/common/xf86Init.c
++++ b/hw/xfree86/common/xf86Init.c
+@@ -545,7 +545,7 @@ InitOutput(ScreenInfo * pScreenInfo, int argc, char **argv)
+                 want_hw_access = TRUE;
+ 
+             if (!(flags & HW_SKIP_CONSOLE))
+-                xorgHWOpenConsole = TRUE;
++                xorgHWOpenConsole = !ServerIsNotSeat0();
+         }
+ 
+         if (xorgHWOpenConsole)

@@ -1,0 +1,18 @@
+From: =?UTF-8?q?La=C3=A9rcio=20de=20Sousa?= <lbsousajr@gmail.com>
+Date: Thu, 7 Nov 2013 09:31:56 -0200
+Subject: [PATCH] xfree86: Keep a non-seat0 X server from touching VTs
+ (#71258)
+
+Index: xorg-server-1.14.3/hw/xfree86/common/xf86Init.c
+===================================================================
+--- xorg-server-1.14.3.orig/hw/xfree86/common/xf86Init.c	2013-11-08 14:15:14.531034220 -0200
++++ xorg-server-1.14.3/hw/xfree86/common/xf86Init.c	2013-11-08 14:18:01.883037464 -0200
+@@ -576,7 +576,7 @@
+                 want_hw_access = TRUE;
+ 
+             if (!(flags & HW_SKIP_CONSOLE))
+-                xorgHWOpenConsole = TRUE;
++                xorgHWOpenConsole = !ServerIsNotSeat0();
+ 
+             i++;
+         }

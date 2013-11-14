@@ -42,7 +42,7 @@
 Summary:   X.Org X11 X server
 Name:      xorg-x11-server
 Version:   1.14.99.901
-Release:   5%{?gitdate:.%{gitdate}}%{dist}
+Release:   5%{?gitdate:.%{gitdate}}.multiseat1%{dist}
 URL:       http://www.x.org
 License:   MIT
 Group:     User Interface/X
@@ -168,6 +168,12 @@ Patch9013: 0003-damageext-Xineramify-v6.patch
 Patch9014: 0004-composite-Fix-COW-creation-for-Xinerama.patch
 Patch9015: 0005-fixes-Fix-PanoramiXSetPictureClipRegion-for-window-p.patch
 Patch9016: 0006-fixes-Fix-PanoramiXSetWindowShapeRegion.patch
+
+# My multiseat patches
+Patch9996: xserver-non-seat0-defaults.patch
+Patch9997: xserver-add-matchseat.patch
+Patch9998: xserver-fix-card-detection-on-non-seat0.patch
+Patch9999: xserver-block-non-seat0-vt-access.patch
 
 %global moduledir	%{_libdir}/xorg/modules
 %global drimoduledir	%{_libdir}/dri

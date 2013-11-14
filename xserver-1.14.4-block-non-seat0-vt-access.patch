@@ -1,3 +1,8 @@
+From: =?UTF-8?q?La=C3=A9rcio=20de=20Sousa?= <lbsousajr@gmail.com>
+Date: Thu, 7 Nov 2013 09:31:56 -0200
+Subject: [PATCH] xfree86: Keep a non-seat0 X server from touching VTs
+ (#71258)
+
 diff --git a/hw/xfree86/common/xf86Init.c b/hw/xfree86/common/xf86Init.c
 index 91ec4c8..a678f4d 100644
 --- a/hw/xfree86/common/xf86Init.c
